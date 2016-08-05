@@ -1,0 +1,105 @@
+---
+title: "TSRC Provincial Tourism Exploration"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    social: menu
+    source: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(readr)
+library(chorddiag)
+library(treemap)
+library(d3treeR)
+
+# Matrix with data exclusive of same-province visits
+o_e <- matrix(c(0,9,64,26,33,112,2,0,17,21,
+              7,0,121,114,14,32,0,0,8,3,
+              57,226,0,402,57,197,6,13,46,55,
+              10,105,363,0,147,141,8,2,14,14,
+              34,42,57,208,0,2181,44,13,64,128,
+              165,133,240,273,2848,0,241,69,571,587,
+              6,3,12,8,34,407,0,251,215,118,
+              9,3,8,4,25,119,198,0,882,210,
+              46,7,62,11,48,403,104,554,0,2531,
+              11,17,46,19,94,432,57,104,1035,0),
+            byrow = TRUE,
+            nrow = 10, ncol = 10)
+
+# Matrix with data inclusive of same-province visits
+o_i <- matrix(c(1360,9,64,26,33,112,2,0,17,21,
+                7,129,121,114,14,32,0,0,8,3,
+                57,226,1977,402,57,197,6,13,46,55,
+                10,105,363,1312,147,141,8,2,14,14,
+                34,42,57,208,24742,2181,44,13,64,128,
+                165,133,240,273,2848,38875,241,69,571,587,
+                6,3,12,8,34,407,2285,251,215,118,
+                9,3,8,4,25,119,198,3478,882,210,
+                46,7,62,11,48,403,104,554,8333,2531,
+                11,17,46,19,94,432,57,104,1035,10557),
+              byrow = TRUE,
+              nrow = 10, ncol = 10)
+
+provinces <- c("NL","PEI","NS","NB","QC","ON","MB","SK","AB","BC")
+
+dimnames(o_e) <- list(origin = provinces, destination = provinces)
+dimnames(o_i) <- list(origin = provinces, destination = provinces)
+
+colours <- RColorBrewer::brewer.pal(10, "BrBG")
+
+# Treemap
+
+prov_exp <- read_csv("provincial-overnight-expenditures.csv")
+
+
+tm <-treemap(prov_exp,
+             index=c("Province","Type"),
+             vSize="Expenditure",
+             vColor="Province",
+             type="categorical")
+
+```
+
+### Flows of overnight tourist arrivals between Canadian provinces. {data-width=800}
+    
+```{r}
+d3tree2(tm, rootname = "Province")
+
+```
+  
+***
+
+Source: Travel Survey of Residents of Canada 2014, Statistics Canada. Weighted data. Interprovincial flows are rounded to and represented in 1,000s.
+
+Catalogue #: SK-TAB#6-PRV
+
+Chord-diagram based on Mike Bostock's D3.js work (https://bl.ocks.org/mbostock/4062006) and implemented using htmlwidgets and chorddiag R packages (https://github.com/mattflor/chorddiag).
+    
+### Value of expenditures by overnight tourists in each province broken down by category {data-width=800}
+
+```{r}
+chorddiag(o_e, 
+          groupnamePadding = 30, 
+          groupColors = colours,
+          tickInterval = 100,
+          chordedgeColor = "darkgrey",
+          groupedgeColor = "darkgrey",
+          groupThickness = 0.075)
+
+```
+
+***
+Source: Travel Survey of Residents of Canada 2014, Statistics Canada. Weighted data. Reallocated expenditures are represented in $1,000s. 
+
+Catalogue #: SK-TAB#8-PRE
+
+Interactive treemap based on Mike Bostock's D3.js work (https://bost.ocks.org/mike/treemap/) and implemented using htmlwidgets and d3treeR R packages (https://github.com/timelyportfolio/d3treeR).
+
+### Chart 3
+
+```{r}
+
+```
+
